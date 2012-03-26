@@ -12,6 +12,7 @@ end
 
 require 'awesome_print'
 require 'tmpdir'
+require 'nokogiri'
 
 def project_root
   File.join(File.expand_path(File.dirname(__FILE__)), '..')
@@ -19,11 +20,15 @@ end
 
 require "#{project_root}/tasks/jasmine_dev"
 
-def capture_output
-  output = StringIO.new
-  $stdout = output
+def capture_output(capture = true)
+  if capture
+    output = StringIO.new
+    $stdout = output
+  end
   yield
-  output.string
+  if capture
+    output.string
+  end
 ensure
   $stdout = STDOUT
 end
@@ -31,4 +36,16 @@ end
 def reset_dir(dir)
   FileUtils.rm_r dir if File.exists?(dir)
   FileUtils.mkdir_p dir
+end
+
+def jasmine_version
+  version = jasmine_version_object
+
+  version_string = "#{version['major']}.#{version['minor']}.#{version['build']}"
+  version_string += ".rc#{version['release_candidate']}" if version['release_candidate']
+  version_string
+end
+
+def jasmine_version_object
+  @version_object ||= JSON.parse(File.read(File.join(JasmineDev.project_root, 'src', 'version.json')))
 end

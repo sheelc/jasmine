@@ -2,7 +2,8 @@ class JasmineDev < Thor
 
   desc "count_specs", "Count the number of specs for each test runner"
   def count_specs
-    say "Counting specs..."
+    say JasmineDev.spacer
+    say "Counting specs...", :cyan
 
     core_spec_count = count_specs_in(File.join('spec', 'core'))
     console_spec_count = count_specs_in(File.join('spec', 'console'))

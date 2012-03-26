@@ -7,7 +7,6 @@ describe "JSHint task" do
 
   before do
     reset_dir tmp_dir
-
   end
 
   describe "when Node is not present" do
@@ -23,7 +22,6 @@ describe "JSHint task" do
     it "should prompt the user to install Node" do
       @output.should match(/Node\.js is required/)
     end
-
   end
 
   describe "when Node is present" do
@@ -35,6 +33,7 @@ describe "JSHint task" do
 
     it "should tell the user that lint is running" do
       @output.should match(/Running JSHint/)
+      @output.should match(/Jasmine JSHint PASSED/)
     end
   end
 end

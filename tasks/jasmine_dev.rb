@@ -1,11 +1,18 @@
 require 'thor'
 require 'json'
 require 'term/ansicolor'
+require 'tilt'
+require 'ostruct'
 
-path_to = File.expand_path(File.dirname(__FILE__))
+$:.unshift(File.join(File.dirname(__FILE__), "jasmine_dev"))
 
-require "#{path_to}/jasmine_dev/base"
-require "#{path_to}/jasmine_dev/js_hint"
-require "#{path_to}/jasmine_dev/build"
-require "#{path_to}/jasmine_dev/count_specs"
-require "#{path_to}/jasmine_dev/execute_specs"
+require "base"
+require "js_hint"
+require "build_distribution"
+require "build_github_pages"
+require "build_standalone_distribution"
+require "build_standalone_runner"
+require "count_specs"
+require "execute_specs"
+require "release"
+require "version"
