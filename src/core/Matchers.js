@@ -101,6 +101,10 @@ jasmine.Matchers.prototype.toEqual = function(expected) {
   return this.env.equals_(this.actual, expected);
 };
 
+jasmine.Matchers.prototype.toEqual2 = function(expected) {
+  return this.env.equals2_(this.actual, expected);
+};
+
 /**
  * toNotEqual: compares the actual to the expected using the ! of jasmine.Matchers.toEqual
  * @param expected
