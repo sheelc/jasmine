@@ -280,19 +280,21 @@ jasmine.Env.prototype.addEqualityTester = function (equalityTester) {
 jasmine.Env.prototype.equals2_ = function eq(a, b, stack) {
   stack = stack || [];
 
-  function hasKey(obj, keyName) {
-    return obj !== null && obj[keyName] !== jasmine.undefined;
-  }
-
   // Identical objects are equal. `0 === -0`, but they aren't identical.
   // See the Harmony `egal` proposal: http://wiki.ecmascript.org/doku.php?id=harmony:egal.
-  if (a === b) return a !== 0 || 1 / a == 1 / b;
+  if (a === b) {
+    return a !== 0 || 1 / a == 1 / b;
+  }
   // A strict comparison is necessary because `null == undefined`.
-  if (a == null || b == null) return a === b;
+  if (a == null || b == null) {
+    return a === b;
+  }
 
   // Compare `[[Class]]` names.
   var className = toString.call(a);
-  if (className != toString.call(b)) return false;
+  if (className != toString.call(b)) {
+    return false;
+  }
 
   switch (className) {
     // Strings, numbers, dates, and booleans are compared by value.
@@ -317,7 +319,11 @@ jasmine.Env.prototype.equals2_ = function eq(a, b, stack) {
         a.multiline == b.multiline &&
         a.ignoreCase == b.ignoreCase;
   }
-  if (typeof a != 'object' || typeof b != 'object') return false;
+
+  if (typeof a != 'object' || typeof b != 'object') {
+    return false;
+  }
+
   // Assume equality for cyclic structures. The algorithm for detecting cyclic
   // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
   var length = stack.length;
@@ -342,8 +348,16 @@ jasmine.Env.prototype.equals2_ = function eq(a, b, stack) {
       }
     }
   } else {
+
     // Objects with different constructors are not equivalent.
-    if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) return false;
+    if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) {
+      return false;
+    }
+
+    function hasKey(obj, keyName) {
+      return obj !== null && obj[keyName] !== jasmine.undefined;
+    }
+
     // Deep compare objects.
     for (var key in a) {
       if (hasKey(a, key)) {
@@ -363,5 +377,6 @@ jasmine.Env.prototype.equals2_ = function eq(a, b, stack) {
   }
   // Remove the first object from the stack of traversed objects.
   stack.pop();
+
   return result;
 };

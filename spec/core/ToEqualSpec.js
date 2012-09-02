@@ -1,20 +1,8 @@
-// TODO: This is a nice replacement for toEqual
-//
-// * Consider moving to jsDiff for differencing objects
-// *
-
 describe("Matchers", function() {
   var env, suite, spec;
 
-  // TODO: move this to SpecHelper?
-
-  function match(value) {
-    return spec.expect(value);
-  }
-
-  // TODO: this test has WAY too much knowledge of how matchers work - proof tha the results object is hard to use and should have a better interface
   function lastResult() {
-    return spec.addMatcherResult.mostRecentCall.args[0];
+    return (spec.addMatcherResult.mostRecentCall.args[0]).passed();
   }
 
   describe("toEqual2", function() {
@@ -27,93 +15,144 @@ describe("Matchers", function() {
         });
       });
       spyOn(spec, 'addMatcherResult');
-
-      // TODO: if the results object is easier to use, this could go away?
-      this.addMatchers({
-        toPass:function() {
-          return lastResult().passed();
-        },
-        toFail:function() {
-          return !lastResult().passed();
-        }
-      });
     });
 
     it("should compare against null", function() {
-      expect(match(null).toEqual2(null)).toPass();
-      expect(match(null).not.toEqual2(null)).toFail();
+      spec.expect(null).toEqual2(null);
+      expect(lastResult()).toEqual2(true);
 
-      expect(match(null).toEqual2({})).toFail();
-      expect(match(null).not.toEqual2({})).toPass();
+      spec.expect(null).not.toEqual2(null);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(null).toEqual2({});
+      expect(lastResult()).toEqual2(false);
+ 
+      spec.expect(null).not.toEqual2({});
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare against undefined", function() {
-      expect(match(undefined).toEqual2(undefined)).toPass();
-      expect(match(undefined).not.toEqual2(undefined)).toFail();
+      spec.expect(undefined).toEqual2(undefined);
+      expect(lastResult()).toEqual2(true);
 
-      expect(match(undefined).toEqual2({})).toFail();
-      expect(match(undefined).not.toEqual2({})).toPass();
+      spec.expect(undefined).not.toEqual2(undefined);
+      expect(lastResult()).toEqual2(false);
 
-      expect(match(undefined).not.toEqual2(null)).toPass();
-      expect(match(undefined).toEqual2(null)).toFail();
+      spec.expect(undefined).toEqual2({});
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(undefined).not.toEqual2({});
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(undefined).not.toEqual2(null);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(undefined).toEqual2(null);
+      expect(lastResult()).toEqual2(false);
     });
 
     it("should compare Booleans", function() {
-      expect(match(true).toEqual2(true)).toPass();
-      expect(match(true).not.toEqual2(false)).toPass();
+      spec.expect(true).toEqual2(true);
+      expect(lastResult()).toEqual2(true);
 
-      expect(match(false).toEqual2(true)).toFail();
-      expect(match(false).not.toEqual2(false)).toFail();
+      spec.expect(true).not.toEqual2(false);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(false).toEqual2(true);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(false).not.toEqual2(false);
+      expect(lastResult()).toEqual2(false);
     });
 
     it("should compare Strings", function() {
-      expect((match("cat").toEqual("cat"))).toPass();
-      expect((match("cat").not.toEqual("cat"))).toFail();
+      spec.expect("cat").toEqual2("cat");
+      expect(lastResult()).toEqual2(true);
 
-      expect((match("cat").toEqual("123"))).toFail();
-      expect((match("cat").not.toEqual("123"))).toPass();
+      spec.expect("cat").not.toEqual2("cat");
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect("cat").toEqual2("123");
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect("cat").not.toEqual2("123");
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare Dates", function() {
-      expect((match(new Date(2008, 1, 3, 15, 17, 19, 1234)).toEqual(new Date(2009, 1, 3, 15, 17, 19, 1234)))).toFail();
-      expect((match(new Date(2008, 1, 3, 15, 17, 19, 1234)).not.toEqual(new Date(2009, 1, 3, 15, 17, 19, 1234)))).toPass();
+      var date = new Date(2008, 1, 3, 15, 17, 19, 1234);
+      var anotherDate = new Date(2009, 1, 3, 15, 17, 19, 1234);
 
-      expect((match(new Date(2008, 1, 3, 15, 17, 19, 1234)).toEqual(new Date(2008, 1, 3, 15, 17, 19, 1234)))).toPass();
-      expect((match(new Date(2008, 1, 3, 15, 17, 19, 1234)).not.toEqual(new Date(2008, 1, 3, 15, 17, 19, 1234)))).toFail();
+      spec.expect(date).toEqual2(date);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(date).not.toEqual2(date);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(date).toEqual2(anotherDate);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(date).not.toEqual2(anotherDate);
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare Numbers", function() {
-      expect((match(5).toEqual(5))).toPass();
-      expect((match(5).not.toEqual(5))).toFail();
+      spec.expect(5).toEqual2(5);
+      expect(lastResult()).toEqual2(true);
 
-      expect((match(5).toEqual(3276.7))).toFail();
-      expect((match(5).not.toEqual(3276.7))).toPass();
+      spec.expect(5).not.toEqual2(5);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(5).toEqual2(3276.7);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(5).not.toEqual2(3276.7);
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare objects", function() {
-      expect(match({a:1}).toEqual({a:1})).toPass();
-      expect(match({a:1}).not.toEqual({a:1})).toFail();
-      expect(match({a:1}).toEqual({a:2})).toFail();
-      expect(match({a:1}).not.toEqual({a:2})).toPass();
+      spec.expect({a:1}).toEqual2({a:1});
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect({a:1}).not.toEqual2({a:1});
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect({a:1}).toEqual2({a:2});
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect({a:1}).not.toEqual2({a:2});
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare objects with cycles", function() {
       var circularGraph = {};
       circularGraph.referenceToSelf = circularGraph;
 
-      expect((match(circularGraph).toEqual2(circularGraph))).toPass();
-      expect((match(circularGraph).not.toEqual2(circularGraph))).toFail();
+      spec.expect(circularGraph).toEqual2(circularGraph);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(circularGraph).not.toEqual2(circularGraph);
+      expect(lastResult()).toEqual2(false);
     });
 
     it("should compare Arrays", function() {
-      expect(match([1, 2, 3]).toEqual2([1, 2, 3])).toPass();
-      expect(match([1, 2, 3]).not.toEqual2([1, 2, 3])).toFail();
+      spec.expect([1, 2, 3]).toEqual2([1, 2, 3]);
+      expect(lastResult()).toEqual2(true);
 
-      expect(match([1, 2, 3]).toEqual2([3, 2, 1])).toFail();
-      expect(match([1, 2, 3]).not.toEqual2([3, 2, 1])).toPass();
+      spec.expect([1, 2, 3]).not.toEqual2([1, 2, 3]);
+      expect(lastResult()).toEqual2(false);
 
-      expect(match([1]).toEqual2([3, 2, 1])).toFail();
-      expect(match([1]).not.toEqual2([3, 2, 1])).toPass();
+      spec.expect([1, 2, 3]).toEqual2([3, 2, 1]);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect([1, 2, 3]).not.toEqual2([3, 2, 1]);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect([1]).toEqual2([3, 2, 1]);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect([1]).not.toEqual2([3, 2, 1]);
+      expect(lastResult()).toEqual2(true);
     });
 
     it("should compare functions", function() {
@@ -124,30 +163,39 @@ describe("Matchers", function() {
         return 0;
       };
 
-      expect(match(functionA).toEqual2(functionB)).toFail();
-      expect(match(functionA).not.toEqual2(functionB)).toPass();
+      spec.expect(functionA).toEqual2(functionB);
+      expect(lastResult()).toEqual2(false);
+
+      spec.expect(functionA).not.toEqual2(functionB);
+      expect(lastResult()).toEqual2(true);
 
       var functionC = functionB;
 
-      expect(match(functionC).toEqual2(functionB)).toPass();
-      expect(match(functionC).not.toEqual2(functionB)).toFail();
+      spec.expect(functionC).toEqual2(functionB);
+      expect(lastResult()).toEqual2(true);
+
+      spec.expect(functionC).not.toEqual2(functionB);
+      expect(lastResult()).toEqual2(false);
     });
 
-    it("should report its message", function() {
-      var actual = 'a';
-      var matcher = match(actual);
-      var expected = 'b';
-      matcher.toEqual2(expected);
+    describe("message on failure", function() {
 
-      var result = lastResult();
+      it("should explain the object's differences", function() {
+        var actual = {
+          foo: 'a',
+          bar: 'b',
+          baz: 'c'
+        };
+        var expected = {
+          bar: 'b',
+          quux: 'd'
+        };
 
-      expect(result.matcherName).toEqual("toEqual2");
-      expect(result.passed()).toFail();
-      expect(result.message).toMatch(jasmine.pp(actual));
-      expect(result.message).toMatch(jasmine.pp(expected));
-      expect(result.expected).toEqual(expected);
-      expect(result.actual).toEqual(actual);
+        spec.expect(actual).toEqual2(expected);
+        var result = spec.addMatcherResult.mostRecentCall.args[0];
+
+        expect(result.message).toEqual2("Expected { foo : 'a', bar : 'b', baz : 'c' } to equal2 { bar : 'b', quux : 'd' }.");
+      });
     });
-
   });
 });
