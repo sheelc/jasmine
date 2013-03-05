@@ -5,7 +5,7 @@ function standaloneTmpDir(path) {  return "dist/tmp/" + path; }
 
 module.exports = {
   compileSpecRunner: function() {
-    var runnerTemplate = _.template(grunt.file.read("lib/templates/SpecRunner.html.jst")),
+    var runnerTemplate = _.template(grunt.file.read("grunt/templates/SpecRunner.html.jst")),
       runner = runnerTemplate({ jasmineVersion: global.jasmineVersion });
 
     grunt.file.write(standaloneTmpDir("SpecRunner.html"), runner);
