@@ -1,11 +1,11 @@
 var grunt = require('grunt');
-var _ = require("underscore");
 
 function license() {
-  var licenseTemplate = _.template(grunt.file.read("grunt/templates/licenseBanner.js.jst")),
-    currentYear = "" + new Date(Date.now()).getFullYear();
+  var currentYear = "" + new Date(Date.now()).getFullYear();
 
-  return licenseTemplate({ currentYear: currentYear });
+  return grunt.template.process(
+      grunt.file.read("grunt/templates/licenseBanner.js.jst"),
+      { data: { currentYear: currentYear}});
 }
 
 module.exports = {
@@ -32,7 +32,9 @@ module.exports = {
       'src/version.js'
     ],
     dest: 'lib/jasmine-core/jasmine.js'
-
+  },
+  boot: {
+    src: ['lib/jasmine-core/boot/boot.js']
   },
   options: {
     banner: license(),
