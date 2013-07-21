@@ -63,6 +63,31 @@ getJasmineRequireObj().Suite = function() {
     return this.children_;
   };
 
+  Suite.prototype.allFns = function() {
+    var allFns = [],
+        children = this.children_,
+        self = this;
+
+    if(this.disabled) {
+      allFns.push(complete);
+      return allFns;
+    }
+
+    allFns.push(function() { self.onStart(self); });
+
+    var childrenLength = children.length;
+    for(var i = 0; i < childrenLength; i++) {
+      allFns = allFns.concat(children[i].allFns());
+    }
+
+    allFns.push(complete);
+    return allFns;
+
+    function complete() {
+      self.resultCallback(self.result);
+    }
+  };
+
   Suite.prototype.execute = function(onComplete) {
     var self = this;
     if (this.disabled) {

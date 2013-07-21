@@ -9,47 +9,21 @@ getJasmineRequireObj().QueueRunner = function() {
   }
 
   QueueRunner.prototype.execute = function() {
-    this.run(this.fns, 0);
+    this.run(0);
   };
 
-  QueueRunner.prototype.run = function(fns, recursiveIndex) {
-    var length = fns.length,
+  QueueRunner.prototype.run = function(recursiveIndex) {
+    var length = this.fns.length,
         self = this,
         iterativeIndex;
 
     for(iterativeIndex = recursiveIndex; iterativeIndex < length; iterativeIndex++) {
-      var fn = fns[iterativeIndex];
+      var fn = this.fns[iterativeIndex];
       if (fn.length > 0) {
-        var attemptSuccessful = attempt(function() {
-          fn.call(self, function() { self.run(fns, iterativeIndex + 1); });
-        });
-
-        if(attemptSuccessful) {
-          return;
-        }
+        fn.call(self, function() { self.clearStack(function() { self.run(iterativeIndex + 1); }); });
+        return;
       } else {
-        attempt(function() { fn.call(self); });
-      }
-    }
-
-    var runnerDone = iterativeIndex >= length;
-
-    if (runnerDone) {
-      this.clearStack(this.onComplete);
-    }
-
-    function attempt(fn) {
-      try {
-        fn();
-        return true;
-      } catch (e) {
-        self.onException(e);
-        if (!self.catchException(e)) {
-          //TODO: set a var when we catch an exception and
-          //use a finally block to close the loop in a nice way..
-          throw e;
-        }
-        return false;
+        fn.call(self);
       }
     }
   };

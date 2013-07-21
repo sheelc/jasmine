@@ -122,7 +122,7 @@ getJasmineRequireObj().Env = function(j$) {
       options.catchException = self.catchException;
       options.clearStack = options.clearStack || clearStack;
 
-      new j$.QueueRunner(options).run(options.fns, 0);
+      new j$.QueueRunner(options).execute();
     };
 
     var totalSpecsDefined = 0;
@@ -196,7 +196,9 @@ getJasmineRequireObj().Env = function(j$) {
       this.reporter.jasmineStarted({
         totalSpecsDefined: totalSpecsDefined
       });
-      this.topSuite.execute(self.reporter.jasmineDone);
+      var allFns = this.topSuite.allFns();
+      allFns.push(self.reporter.jasmineDone);
+      queueRunnerFactory({ fns: allFns });
     };
   }
 

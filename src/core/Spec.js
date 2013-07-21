@@ -41,6 +41,74 @@ getJasmineRequireObj().Spec = function() {
     return this.expectationFactory(actual, this);
   };
 
+  Spec.prototype.allFns = function() {
+    var allFns = [],
+        self = this;
+
+    allFns.push(function() { self.onStart(self); });
+
+    if(this.markedPending || this.disabled) {
+      allFns.push(complete);
+      return allFns;
+    }
+
+
+    var befores = this.beforeFns() || [],
+      afters = this.afterFns() || [];
+    var unwrappedFns = befores.concat(this.fn).concat(afters);
+
+    for(var i = 0; i < unwrappedFns.length; i++) {
+      var fn = unwrappedFns[i],
+          wrappedFn;
+
+      if(fn.length > 0) {
+        wrappedFn = wrapAsyncFnExecution(fn);
+      } else {
+        wrappedFn = wrapFnExecution(fn);
+      }
+
+      allFns.push(wrappedFn);
+    }
+
+    allFns.push(complete);
+    return allFns;
+
+    function attempt(fn, onException) {
+      onException = onException || function() {};
+
+      try {
+        fn();
+      } catch(e) {
+        onException(e);
+        if (Spec.isPendingSpecException(e)) {
+          self.pend();
+          return;
+        }
+
+        self.addExpectationResult(false, {
+          matcherName: "",
+          passed: false,
+          expected: "",
+          actual: "",
+          error: e
+        });
+      }
+    }
+
+    function wrapAsyncFnExecution(fn) {
+      return function(done) { attempt(function() { fn(done); }, function() { done(); }); };
+    }
+
+    function wrapFnExecution(fn) {
+      return function() { attempt(fn); };
+    }
+
+    function complete() {
+      self.result.status = self.status();
+      self.resultCallback(self.result);
+    }
+  };
+
   Spec.prototype.execute = function(onComplete) {
     var self = this;
 

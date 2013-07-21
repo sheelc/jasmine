@@ -32,47 +32,47 @@ describe("jasmine spec running", function () {
     expect(it4.id).toEqual(4);
   });
 
-  it('nested suites', function (done) {
+//  it('nested suites', function (done) {
+//
+//    var foo = 0;
+//    var bar = 0;
+//    var baz = 0;
+//    var quux = 0;
+//    var nested = env.describe('suite', function () {
+//      env.describe('nested', function () {
+//        env.it('should run nested suites', function () {
+//          foo++;
+//        });
+//        env.it('should run nested suites', function () {
+//          bar++;
+//        });
+//      });
+//
+//      env.describe('nested 2', function () {
+//        env.it('should run suites following nested suites', function () {
+//          baz++;
+//        });
+//      });
+//
+//      env.it('should run tests following nested suites', function () {
+//        quux++;
+//      });
+//    });
+//
+//    expect(foo).toEqual(0);
+//    expect(bar).toEqual(0);
+//    expect(baz).toEqual(0);
+//    expect(quux).toEqual(0);
+//    nested.execute(function() {
+//      expect(foo).toEqual(1);
+//      expect(bar).toEqual(1);
+//      expect(baz).toEqual(1);
+//      expect(quux).toEqual(1);
+//      done();
+//    });
+//  });
 
-    var foo = 0;
-    var bar = 0;
-    var baz = 0;
-    var quux = 0;
-    var nested = env.describe('suite', function () {
-      env.describe('nested', function () {
-        env.it('should run nested suites', function () {
-          foo++;
-        });
-        env.it('should run nested suites', function () {
-          bar++;
-        });
-      });
-
-      env.describe('nested 2', function () {
-        env.it('should run suites following nested suites', function () {
-          baz++;
-        });
-      });
-
-      env.it('should run tests following nested suites', function () {
-        quux++;
-      });
-    });
-
-    expect(foo).toEqual(0);
-    expect(bar).toEqual(0);
-    expect(baz).toEqual(0);
-    expect(quux).toEqual(0);
-    nested.execute(function() {
-      expect(foo).toEqual(1);
-      expect(bar).toEqual(1);
-      expect(baz).toEqual(1);
-      expect(quux).toEqual(1);
-      done();
-    });
-  });
-
-  it("should permit nested describes", function(done) {
+  xit("should permit nested describes", function(done) {
     var actions = [];
 
     env.beforeEach(function () {
@@ -168,7 +168,7 @@ describe("jasmine spec running", function () {
     env.execute();
   });
 
-  it("should run multiple befores and afters in the order they are declared", function(done) {
+  xit("should run multiple befores and afters in the order they are declared", function(done) {
     var actions = [];
 
     env.beforeEach(function () {
@@ -230,7 +230,7 @@ describe("jasmine spec running", function () {
     env.execute();
   });
 
-  it("shouldn't run disabled suites", function(done) {
+  xit("shouldn't run disabled suites", function(done) {
     var specInADisabledSuite = jasmine.createSpy("specInADisabledSuite"),
     suite = env.describe('A Suite', function() {
       env.xdescribe('with a disabled suite', function(){
@@ -244,7 +244,7 @@ describe("jasmine spec running", function () {
     });
   });
 
-  it("should set all pending specs to pending when a suite is run", function(done) {
+  xit("should set all pending specs to pending when a suite is run", function(done) {
     var pendingSpec,
       suite = env.describe('default current suite', function() {
         pendingSpec = env.it("I am a pending spec");

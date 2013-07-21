@@ -1,5 +1,5 @@
 describe("performance", function() {
-  for (var i = 0; i < 10000; i++) {
+  for (var i = 0; i < 20000; i++) {
     it("should pass", function() {
       expect(true).toBe(true);
     });
