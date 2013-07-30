@@ -4,7 +4,9 @@
   window.jasmine = jasmineRequire.core(jasmineRequire);
   jasmineRequire.html(jasmine);
 
-  var env = jasmine.getEnv();
+  var env = jasmine.getEnv(),
+      suitesToRun = [],
+      specsToRun = [];
 
   var jasmineInterface = {
     describe: function(description, specDefinitions) {
@@ -15,12 +17,24 @@
       return env.xdescribe(description, specDefinitions);
     },
 
+    fdescribe: function(description, specDefinitions) {
+      var suite = env.describe(description, specDefinitions);
+      suitesToRun.push(suite);
+      return suite;
+    },
+
     it: function(desc, func) {
       return env.it(desc, func);
     },
 
     xit: function(desc, func) {
       return env.xit(desc, func);
+    },
+
+    fit: function(desc, func) {
+      var spec = env.it(desc, func);
+      specsToRun.push(spec);
+      return spec;
     },
 
     beforeEach: function(beforeEachFunction) {
@@ -107,12 +121,51 @@
     jasmineRequire.html(j$);
     jasmineRequire.console(jasmineRequire, j$);
 
-    env.execute();
+    var runnablesToRun = toRun(suitesToRun, specsToRun);
+    runnablesToRun.length ? env.execute(runnablesToRun) : env.execute();
   };
 
   function extend(destination, source) {
     for (var property in source) destination[property] = source[property];
     return destination;
+  }
+
+  function toRun(suitesToRun, specsToRun) {
+    var specsAlreadyIncluded = specsFromSuites(suitesToRun);
+    var runnablesToRun = suitesToRun.concat(setDifference(specsToRun, specsAlreadyIncluded));
+
+    var runnableIds = [];
+    for(var i = 0; i < runnablesToRun.length; i++) {
+      runnableIds.push(runnablesToRun[i].id);
+    }
+
+    return runnableIds;
+  }
+
+  function specsFromSuites(suitesToRun) {
+    var specs = [];
+    var runnables = suitesToRun.slice(0);
+    while(runnables.length) {
+      var runnable = runnables.pop();
+      if (runnable.children_) {
+        runnables = runnables.concat(runnable.children_);
+      } else {
+        specs.push(runnable);
+      }
+    }
+
+    return specs;
+  }
+
+  function setDifference(a, b) {
+    var newSet = [];
+    for(var i = 0; i < a.length; i++) {
+      if(b.indexOf(a[i]) === -1) {
+        newSet.push(a[i]);
+      }
+    }
+
+    return newSet;
   }
 
 }());
