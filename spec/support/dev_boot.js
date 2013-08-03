@@ -4,7 +4,9 @@
   window.jasmine = jasmineRequire.core(jasmineRequire);
   jasmineRequire.html(jasmine);
 
-  var env = jasmine.getEnv();
+  var env = jasmine.getEnv(),
+      inFocusedSuite = false,
+      runnablesToRun = [];
 
   var jasmineInterface = {
     describe: function(description, specDefinitions) {
@@ -15,12 +17,33 @@
       return env.xdescribe(description, specDefinitions);
     },
 
+    fdescribe: function(description, specDefinitions) {
+      if(inFocusedSuite) {
+        return env.describe(description, specDefinitions);
+      }
+
+      inFocusedSuite = true;
+      var suite = env.describe(description, specDefinitions);
+      inFocusedSuite = false;
+
+      runnablesToRun.push(suite.id);
+      return suite;
+    },
+
     it: function(desc, func) {
       return env.it(desc, func);
     },
 
     xit: function(desc, func) {
       return env.xit(desc, func);
+    },
+
+    fit: function(desc, func) {
+      var spec = env.it(desc, func);
+      if(!inFocusedSuite) {
+        runnablesToRun.push(spec.id);
+      }
+      return spec;
     },
 
     beforeEach: function(beforeEachFunction) {
@@ -102,7 +125,7 @@
     jasmineRequire.html(j$);
     jasmineRequire.console(jasmineRequire, j$);
 
-    env.execute();
+    runnablesToRun.length ? env.execute(runnablesToRun) : env.execute();
   };
 
   function extend(destination, source) {
