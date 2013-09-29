@@ -4,7 +4,12 @@
   window.jasmine = jasmineRequire.core(jasmineRequire);
   jasmineRequire.html(jasmine);
 
-  var env = jasmine.getEnv();
+  var env = jasmine.getEnv(),
+      executionFilters = [];
+
+  window.jasmine.addExecutionFilter = function(filter) {
+    executionFilters.push(filter);
+  };
 
   var jasmineInterface = {
     describe: function(description, specDefinitions) {
@@ -102,7 +107,12 @@
     jasmineRequire.html(j$);
     jasmineRequire.console(jasmineRequire, j$);
 
-    env.execute();
+    var specsToRun = [env.topSuite.id];
+    for (var i = 0; i < executionFilters.length; i++) {
+      specsToRun = executionFilters[i](specsToRun);
+    }
+
+    env.execute(specsToRun);
   };
 
   function extend(destination, source) {

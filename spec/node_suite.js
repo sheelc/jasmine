@@ -6,11 +6,17 @@ var path = require('path');
 var jasmineRequire = require('../lib/jasmine-core/jasmine.js');
 var jasmine = jasmineRequire.core(jasmineRequire);
 
+global.jasmine = jasmine;
 var consoleFns = require('../src/console/console.js');
 extend(jasmineRequire, consoleFns);
 jasmineRequire.console(jasmineRequire, jasmine);
 
-var env = jasmine.getEnv();
+var env = jasmine.getEnv(),
+    executionFilters = [];
+
+jasmine.addExecutionFilter = function(filter) {
+  executionFilters.push(filter);
+};
 
 var jasmineInterface = {
   describe: function(description, specDefinitions) {
@@ -69,7 +75,6 @@ function extend(destination, source) {
 
 // Jasmine "runner"
 function executeSpecs(specs, done, isVerbose, showColors) {
-  global.jasmine = jasmine;
 
   for (var i = 0; i < specs.length; i++) {
     var filename = specs[i];
@@ -85,7 +90,12 @@ function executeSpecs(specs, done, isVerbose, showColors) {
   });
 
   env.addReporter(consoleReporter);
-  env.execute();
+
+  var specsToRun = [env.topSuite.id];
+  for (var i = 0; i < executionFilters.length; i++) {
+    specsToRun = executionFilters[i](specsToRun);
+  }
+  env.execute(specsToRun);
 }
 
 function getFiles(dir, matcher) {
@@ -126,6 +136,7 @@ var j$require = (function() {
   var srcFiles = getFiles(__dirname + "/../src/core");
   srcFiles.push(__dirname + "/../src/version.js");
   srcFiles.push(__dirname + "/../src/console/ConsoleReporter.js");
+  srcFiles.push(__dirname + "/javascripts/support/focused_specs.js");
 
   for (var i = 0; i < srcFiles.length; i++) {
     require(srcFiles[i]);
@@ -141,7 +152,7 @@ var j$require = (function() {
   }
 }());
 
-var j$ = j$require.core(j$require);
+j$ = j$require.core(j$require);
 j$require.console(j$require, j$);
 
 // options from command line
