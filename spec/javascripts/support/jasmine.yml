@@ -18,9 +18,6 @@ stylesheets:
 boot_dir: 'spec/javascripts/support'
 boot_files:
   - 'dev_boot.js'
-  - 'executionFiltersUtil.js'
-  - 'focusedSpecs.js'
-  - 'randomizedSpecs.js'
 helpers:
   - 'helpers/**/*.js'
 spec_files:
